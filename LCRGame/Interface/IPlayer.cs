@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LCRGame.Interface
 {
-    internal interface IPlayerOperation
+    public interface IPlayer
     {
         void ChangeChip(int number);
 
@@ -14,6 +14,12 @@ namespace LCRGame.Interface
 
         int GetChip();
 
-        List<string> RollDice();
+        IPlayer GetLeftPlayer();
+
+        IPlayer GetRightPlayer();
+
+        void SetLeftPlayer(IPlayer leftPlayer);
+
+        void SetRightPlayer(IPlayer rightPlayer);
     }
 }

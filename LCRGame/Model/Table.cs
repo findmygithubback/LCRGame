@@ -15,22 +15,15 @@ namespace LCRGame.Model
     public class Table : INotifyPropertyChanged, ITableOperation
     {
         private const int InitChipNumber = 3;
+        private List<IPlayer> players = new List<IPlayer>();
+        private IGame game;
 
-        #region Properties
-        private ObservableCollection<Player> players = new ObservableCollection<Player>();
-        public ObservableCollection<Player> Players
+        public Table(IGame game)
         {
-            get { return players; }
-            set
-            {
-                if (value != players)
-                {
-                    players = value;
-                    OnPropertyChanged();
-                }
-            }
+            this.game = game;
         }
 
+        #region Properties
         private int currentGames;
         public int CurrentGames
         {
@@ -160,7 +153,7 @@ namespace LCRGame.Model
         private void ResetChip()
         {
             ChipsOnTable = 0;
-            foreach (var p in Players)
+            foreach (var p in players)
             {
                 p.SetChip(InitChipNumber);
             }
@@ -170,26 +163,26 @@ namespace LCRGame.Model
         {
             int turns = 0;
             int index = 0;
-            int totalPlayers = Players.Count();
+            int totalPlayers = players.Count();
             while (true)
             {
                 var currentIndex = index % totalPlayers;
-                if (Players[currentIndex].TotalChips > 0)
+                if (players[currentIndex].GetChip() > 0)
                 {
                     turns++;
-                    var diceResult = Players[currentIndex].RollDice();
+                    var diceResult = game.RollDice(players[currentIndex].GetChip());
 
                     var totalLeft = diceResult.Where(x => x == "L").Count();
-                    Players[currentIndex].LeftPlayer.ChangeChip(totalLeft);
-                    Players[currentIndex].ChangeChip(-totalLeft);
+                    players[currentIndex].GetLeftPlayer().ChangeChip(totalLeft);
+                    players[currentIndex].ChangeChip(-totalLeft);
 
                     var totalRight = diceResult.Where(x => x == "R").Count();
-                    Players[currentIndex].RightPlayer.ChangeChip(totalRight);
-                    Players[currentIndex].ChangeChip(-totalRight);
+                    players[currentIndex].GetRightPlayer().ChangeChip(totalRight);
+                    players[currentIndex].ChangeChip(-totalRight);
 
                     var totalCenter = diceResult.Where(x => x == "C").Count();
                     ChangeChip(totalCenter);
-                    Players[currentIndex].ChangeChip(-totalCenter);
+                    players[currentIndex].ChangeChip(-totalCenter);
                 }
 
                 index++;
@@ -219,7 +212,7 @@ namespace LCRGame.Model
 
         private bool IsGameOver()
         {
-            if (Players.Where(x => x.TotalChips != 0).Count() == 1)
+            if (players.Where(x => x.GetChip() != 0).Count() == 1)
             {
                 return true;
             }
@@ -244,24 +237,21 @@ namespace LCRGame.Model
         {
             ResetChip();
             ResetStatisticData();
-            Players.Clear();
+            players.Clear();
         }
 
-        public void InitTable(int numPlayer, int totalGames)
+        public void InitTable(List<IPlayer> players, int totalGames)
         {
-            if (numPlayer >= 3)
-            {
-                for (int i = 0; i < numPlayer; i++)
-                {
-                    Players.Add(new Player(InitChipNumber, (i + 1).ToString()));
-                }
-            }
+            var numPlayer = players.Count();
 
             for (int i = 0; i < numPlayer; i++)
             {
-                Players[i].LeftPlayer = Players[(i - 1 + numPlayer) % numPlayer];
-                Players[i].RightPlayer = Players[(i + 1) % numPlayer];
+                players[i].SetChip(InitChipNumber);
+                players[i].SetLeftPlayer(players[(i - 1 + numPlayer) % numPlayer]);
+                players[i].SetRightPlayer(players[(i + 1) % numPlayer]);
             }
+
+            this.players.AddRange(players);
 
             TotalGames = totalGames;
         }

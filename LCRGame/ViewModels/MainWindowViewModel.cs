@@ -1,8 +1,10 @@
-﻿using LCRGame.Model;
+﻿using LCRGame.Interface;
+using LCRGame.Model;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -17,11 +19,26 @@ namespace LCRGame.ViewModels
     {
         public MainWindowViewModel()
         {
+            table = new Table(new Game());
             this.SimulateCommand = new DelegateCommand(OnSimulate);
         }
 
         #region Properties
-        private Table table = new Table();
+        private ObservableCollection<Player> players = new ObservableCollection<Player>();
+        public ObservableCollection<Player> Players
+        {
+            get { return players; }
+            set
+            {
+                if (value != players)
+                {
+                    players = value;
+                    this.RaisePropertyChanged(nameof(Players));
+                }
+            }
+        }
+
+        private Table table;
         public Table GameTable
         {
             get { return table; }
@@ -90,8 +107,14 @@ namespace LCRGame.ViewModels
             else
             {
                 IsButtonEnabled = false;
+
+                for (int i = 0; i < NumberPlayer; i++)
+                {
+                    Players.Add(new Player((i + 1).ToString()));
+                }
+
                 table.ClearTable();
-                table.InitTable(NumberPlayer, TotalGames);
+                table.InitTable(players.Cast<IPlayer>().ToList(), TotalGames);
                 await table.StartTable();
                 IsButtonEnabled = true;
             }

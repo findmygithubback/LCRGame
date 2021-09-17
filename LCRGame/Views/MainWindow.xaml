@@ -36,7 +36,7 @@
                 </StackPanel>
             </StackPanel>
             
-            <ListView ItemsSource="{Binding Path=GameTable.Players}" Grid.Column="1" Margin="10">
+            <ListView ItemsSource="{Binding Path=Players}" Grid.Column="1" Margin="10">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <WrapPanel>

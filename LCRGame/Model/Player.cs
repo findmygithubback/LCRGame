@@ -9,17 +9,19 @@ using System.Threading.Tasks;
 
 namespace LCRGame.Model
 {
-    public class Player: INotifyPropertyChanged, IPlayerOperation
+    public class Player: INotifyPropertyChanged, IPlayer
     {
-        private List<string> dice = new List<string>() { "L", ".", "R", ".", "C", "." };
+        private IPlayer leftPlayer;
+        private IPlayer rightPlayer;
 
-        public Player LeftPlayer;
-        public Player RightPlayer;
+        public Player(string name)
+        {
+            this.name = name;
+        }
 
-        public Player(int chips, string name)
+        public Player(int chips, string name) : this(name)
         {
             totalChips = chips;
-            this.name = name;
         }
 
         private string name;
@@ -78,24 +80,24 @@ namespace LCRGame.Model
             return totalChips;
         }
 
-        public List<string> RollDice()
+        public IPlayer GetLeftPlayer()
         {
-            if (totalChips == 0)
-            {
-                return null;
-            }
-            else
-            {
-                int rolls = Math.Min(totalChips, 3);
-                List<string> result = new List<string>();
-                Random random = new Random(DateTime.Now.Millisecond);
-                for (int i = 0; i < rolls; i++)
-                {
-                    result.Add(dice[random.Next(0, 6)]);
-                }
+            return leftPlayer;
+        }
 
-                return result;
-            }
+        public IPlayer GetRightPlayer()
+        {
+            return rightPlayer;
+        }
+
+        public void SetLeftPlayer(IPlayer leftPlayer)
+        {
+            this.leftPlayer = leftPlayer;
+        }
+
+        public void SetRightPlayer(IPlayer rightPlayer)
+        {
+            this.rightPlayer = rightPlayer;
         }
     }
 }

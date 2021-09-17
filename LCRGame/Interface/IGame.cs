@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace LCRGame.Interface
 {
-    internal interface ITableOperation
+    public interface IGame
     {
-        Task StartTable();
-
-        void ClearTable();
-
-        void InitTable(List<IPlayer> players, int totalGames);
+        List<string> RollDice(int diceCount);
     }
 }
